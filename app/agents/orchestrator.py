@@ -26,12 +26,42 @@ class AcademicAnalysisOrchestrator:
     def __init__(self):
         self.logger = logger
         
-        # 初始化所有Agent
-        self.parser_agent = PaperParserAgent()
-        self.math_agent = MathModelAgent()
-        self.domain_agent = DomainAnalyzerAgent()
-        self.scholar_agent = ScholarAnalyzerAgent()
-        self.tech_roadmap_agent = TechRoadmapAgent()
+        # 延迟初始化Agent，防止启动时的代理参数验证问题
+        self._parser_agent = None
+        self._math_agent = None
+        self._domain_agent = None
+        self._scholar_agent = None
+        self._tech_roadmap_agent = None
+    
+    @property
+    def parser_agent(self):
+        if self._parser_agent is None:
+            self._parser_agent = PaperParserAgent()
+        return self._parser_agent
+    
+    @property
+    def math_agent(self):
+        if self._math_agent is None:
+            self._math_agent = MathModelAgent()
+        return self._math_agent
+    
+    @property
+    def domain_agent(self):
+        if self._domain_agent is None:
+            self._domain_agent = DomainAnalyzerAgent()
+        return self._domain_agent
+    
+    @property
+    def scholar_agent(self):
+        if self._scholar_agent is None:
+            self._scholar_agent = ScholarAnalyzerAgent()
+        return self._scholar_agent
+    
+    @property
+    def tech_roadmap_agent(self):
+        if self._tech_roadmap_agent is None:
+            self._tech_roadmap_agent = TechRoadmapAgent()
+        return self._tech_roadmap_agent
     
     async def analyze_paper(self, paper_input: PaperInput) -> PaperAnalysis:
         """

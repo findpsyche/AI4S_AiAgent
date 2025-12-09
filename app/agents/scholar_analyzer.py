@@ -21,10 +21,13 @@ class ScholarAnalyzerAgent:
     
     def __init__(self):
         self.logger = logger
+        import os
+        os.environ['OPENAI_PROXY'] = ''
+        
         self.llm = ChatOpenAI(
-            model=settings.OPENAI_MODEL,
+            model_name=settings.OPENAI_MODEL,
             temperature=settings.OPENAI_TEMPERATURE,
-            api_key=settings.OPENAI_API_KEY
+            openai_api_key=settings.OPENAI_API_KEY
         )
     
     async def analyze_scholars(self, 

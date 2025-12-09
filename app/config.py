@@ -7,6 +7,13 @@ from pydantic_settings import BaseSettings
 from functools import lru_cache
 from typing import Optional
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# 加载 .env 文件
+env_path = Path(__file__).parent.parent / ".env"
+if env_path.exists():
+    load_dotenv(env_path)
 
 
 class Settings(BaseSettings):

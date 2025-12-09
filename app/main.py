@@ -6,13 +6,22 @@ Main FastAPI Application
 import logging
 import asyncio
 import uuid
+import sys
+import os
 from datetime import datetime
 from typing import Optional
 from pathlib import Path
 
+# 确保app模块可以被导入
+# 添加项目根目录到Python路径
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
 from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from contextlib import asynccontextmanager
 import uvicorn
 
 from app.config import settings
@@ -28,22 +37,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# 创建FastAPI应用
-app = FastAPI(
-    title=settings.APP_NAME,
-    version=settings.VERSION,
-    description="学术助手 - AI驱动的论文分析系统"
-)
-
-# CORS中间件
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # 全局服务实例
 orchestrator = AcademicAnalysisOrchestrator()
 cache_service = CacheService()
@@ -53,9 +46,11 @@ rag_service = RAGService()
 task_queue: dict = {}
 
 
-@app.on_event("startup")
-async def startup_event():
-    """应用启动事件"""
+# 使用现代的 lifespan 上下文管理器替代废弃的 on_event
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """应用生命周期管理"""
+    # 启动事件
     logger.info("🚀 学术助手系统启动中...")
     
     # 创建必要的目录
@@ -68,13 +63,30 @@ async def startup_event():
     await rag_service.initialize()
     
     logger.info("✅ 系统启动完成")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """应用关闭事件"""
+    
+    yield
+    
+    # 关闭事件
     await cache_service.disconnect()
     logger.info("👋 系统已关闭")
+
+
+# 创建FastAPI应用，包含生命周期管理
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.VERSION,
+    description="学术助手 - AI驱动的论文分析系统",
+    lifespan=lifespan
+)
+
+# CORS中间件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -102,7 +114,7 @@ async def health_check():
 @app.post("/api/v1/analyze", response_model=TaskResponse)
 async def analyze_paper(
     background_tasks: BackgroundTasks,
-    file: Optional[UploadFile] = File(None),
+    file: Optional[UploadFile] = None,
     arxiv_id: Optional[str] = None,
     doi: Optional[str] = None,
     title: Optional[str] = None

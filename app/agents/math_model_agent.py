@@ -9,6 +9,7 @@ import json
 from typing import List, Dict, Any
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
+from pydantic import ConfigDict
 
 from app.models.schemas import MathModel
 from app.config import settings
@@ -21,10 +22,14 @@ class MathModelAgent:
     
     def __init__(self):
         self.logger = logger
+        # 禁用代理验证，防止 Pydantic 验证错误
+        import os
+        os.environ['OPENAI_PROXY'] = ''
+        
         self.llm = ChatOpenAI(
-            model=settings.OPENAI_MODEL,
+            model_name=settings.OPENAI_MODEL,
             temperature=settings.OPENAI_TEMPERATURE,
-            api_key=settings.OPENAI_API_KEY
+            openai_api_key=settings.OPENAI_API_KEY
         )
         
         self.prompt = ChatPromptTemplate.from_messages([

@@ -5,7 +5,7 @@ Paper Parser Agent
 
 import logging
 from typing import Dict, Any, Optional, List
-import pymupdf  # PyMuPDF
+import fitz  # PyMuPDF (imported as fitz)
 import re
 from datetime import datetime
 
