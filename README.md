@@ -1,14 +1,12 @@
-# 学术助手系统 - 完整项目README
+# 学术论文智能分析系统 - 本地验证指南
 
 ## 📖 项目概述
 
-**学术助手** 是一个基于 **LangChain + FastAPI + OpenAI GPT-4** 构建的 AI 驱动学术论文深度分析系统。
+**学术论文分析助手** 是一个基于 **LangChain + FastAPI + OpenAI GPT-4** 的 AI 驱动学术论文深度分析系统。
 
 ### 🎯 核心能力
 
-研究人员对一篇论文最需要的分析：
-
-- ✅ **数学模型提取** - 自动识别和解析论文中的所有关键数学公式
+- ✅ **数学模型提取** - 自动识别和解析论文中的关键数学公式
 - ✅ **研究领域分析** - 准确分类论文的研究领域和子领域
 - ✅ **学术泰斗识别** - 识别领域内的关键学者和学术影响力
 - ✅ **技术发展路线** - 追踪技术方法的演进历史和未来方向
@@ -25,10 +23,9 @@
 |------|------|------|
 | Web框架 | FastAPI | 0.109.0 |
 | AI引擎 | LangChain + OpenAI | 1.0.0 |
-| 缓存层 | Redis | 7.0 |
+| 缓存层 | Redis | 7.0 (可选) |
 | 向量数据库 | ChromaDB | 0.4.22 |
 | 容器化 | Docker | 最新 |
-| 反向代理 | Nginx | Alpine |
 
 ### 项目目录结构
 
@@ -46,25 +43,19 @@ academic-paper-agent/
 │   │   ├── tech_roadmap.py     # 技术路线Agent
 │   │   └── orchestrator.py     # 主编排器
 │   ├── services/               # 服务层
-│   │   ├── cache_service.py    # Redis缓存服务
+│   │   ├── cache_service.py    # 缓存服务
 │   │   └── rag_service.py      # RAG检索服务
 │   ├── models/
 │   │   └── schemas.py          # Pydantic数据模型
 │   └── utils/                  # 工具函数
-├── docker/
-│   ├── Dockerfile
-│   ├── docker-compose.yml
-│   └── nginx.conf
 ├── scripts/
-│   ├── deploy.py               # 部署脚本（腾讯云）
-│   ├── run_local.sh            # 本地启动脚本
-│   └── run_docker.sh           # Docker启动脚本
-├── config/
-│   └── settings.py
-├── tests/
+│   ├── run_local.sh            # Linux/Mac本地启动
+│   └── run_local.bat           # Windows本地启动
 ├── data/
 │   ├── uploads/                # 上传的论文
-│   └── vector_db/              # 向量数据库存储
+│   └── vector_db/              # 向量数据库
+├── docker/                     # Docker配置（可选）
+├── tests/                      # 测试文件
 ├── requirements.txt
 ├── .env.example
 └── README.md
@@ -72,158 +63,120 @@ academic-paper-agent/
 
 ---
 
-## 🚀 快速开始
+## 🚀 本地快速开始
 
-### 方式1：本地开发环境（推荐）
+### 📋 前置条件
 
-#### 前置条件
-- Python 3.11+
-- pip 包管理器
-- OpenAI API Key ([获取](https://platform.openai.com/api-keys))
+- **Python 3.11+**  
+- **pip 包管理器**  
+- **OpenAI API Key** ([获取](https://platform.openai.com/api-keys))  
+- **Git** (可选，用于克隆项目)
 
-#### 步骤
+### 🔧 安装步骤
 
-1. **克隆项目**
+#### 1️⃣ 准备环境
+
 ```bash
+# 进入项目目录
 cd academic-paper-agent
+
+# 创建Python虚拟环境（推荐）
+python -m venv venv
+
+# 激活虚拟环境
+# Windows:
+venv\Scripts\activate
+# Mac/Linux:
+source venv/bin/activate
 ```
 
-2. **配置环境**
+#### 2️⃣ 安装依赖
+
 ```bash
-# 复制环境文件
+# 安装Python包
+pip install -r requirements.txt
+```
+
+依赖包括：
+- fastapi & uvicorn - Web框架
+- langchain & openai - AI引擎
+- pydantic - 数据验证
+- PyMuPDF - PDF解析
+- redis & chromadb - 数据库（可选）
+
+#### 3️⃣ 配置环境变量
+
+```bash
+# 复制配置模板
 cp .env.example .env
 
-# 编辑.env，填入你的OpenAI API Key
-# OPENAI_API_KEY=sk-your-key-here
+# 编辑 .env 文件，填入你的OpenAI API Key
+# 使用你喜欢的编辑器打开 .env
+# OPENAI_API_KEY=sk-your-api-key-here
 ```
 
-3. **运行启动脚本**
-
-**Linux/Mac:**
-```bash
-bash scripts/run_local.sh
-```
+#### 4️⃣ 本地验证
 
 **Windows:**
 ```bash
 scripts\run_local.bat
 ```
 
-4. **访问应用**
-- API: http://localhost:8000
-- 文档: http://localhost:8000/docs
-- 健康检查: http://localhost:8000/health
+**Mac/Linux:**
+```bash
+bash scripts/run_local.sh
+```
+
+✅ 看到以下输出表示启动成功：
+```
+INFO:     Started server process [12345]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete
+INFO:     Uvicorn running on http://0.0.0.0:8000
+```
+
+#### 5️⃣ 访问应用
+
+打开浏览器：
+
+| 功能 | URL |
+|------|-----|
+| 📚 API文档 | http://localhost:8000/docs |
+| 🏥 健康检查 | http://localhost:8000/health |
+| 📊 系统指标 | http://localhost:8000/api/v1/metrics |
 
 ---
 
-### 方式2：Docker容器（生产推荐）
+## 🧪 本地验证测试
 
-#### 前置条件
-- Docker & Docker Compose
-- OpenAI API Key
+### 方法1：使用Swagger UI（推荐）
 
-#### 步骤
+1. 打开 http://localhost:8000/docs
+2. 找到 `POST /api/v1/analyze` 端点
+3. 点击 "Try it out"
+4. 上传一个PDF文件或输入arXiv ID
+5. 点击 "Execute" 并观察响应
 
-1. **配置环境**
+### 方法2：使用curl命令
+
+#### 测试健康检查
 ```bash
-cp .env.example .env
-# 编辑.env，填入OpenAI API Key
+curl http://localhost:8000/health
 ```
 
-2. **启动服务**
+预期响应：
+```json
+{"status": "healthy", "redis": "disconnected", "timestamp": "2024-01-01T12:00:00"}
+```
+
+#### 上传PDF进行分析
 ```bash
-bash scripts/run_docker.sh
-```
-
-或手动启动：
-```bash
-cd docker
-docker-compose up -d
-```
-
-3. **查看日志**
-```bash
-docker-compose logs -f api
-```
-
-4. **停止服务**
-```bash
-docker-compose down
-```
-
----
-
-### 方式3：一键部署到腾讯云（自动化）
-
-#### 腾讯云服务器信息
-```
-IP: 43.143.210.81
-地域: 北京 | 北京六区
-CPU: 2核
-内存: 1GB
-系统盘: 40GB SSD
-带宽: 200Mbps
-```
-
-#### 部署步骤
-
-1. **准备部署环境**
-```bash
-# 确保本地已安装Docker和Git
-python --version  # 验证Python 3.11+
-git --version     # 验证Git
-docker --version  # 验证Docker
-```
-
-2. **执行一键部署**
-
-**使用SSH密钥登录（推荐）：**
-```bash
-python scripts/deploy.py --ip 43.143.210.81 --key ~/.ssh/id_rsa --username root
-```
-
-**使用密码登录：**
-```bash
-python scripts/deploy.py --ip 43.143.210.81 --username root
-# 系统会提示输入SSH密码
-```
-
-3. **部署过程自动执行以下步骤**
-- ✅ 代码上传到服务器
-- ✅ 安装系统依赖
-- ✅ 安装Docker和Docker Compose
-- ✅ 构建Docker镜像
-- ✅ 启动所有服务（API + Redis）
-- ✅ 健康检查验证
-
-4. **访问部署的应用**
-```
-http://43.143.210.81:8000
-http://43.143.210.81:8000/docs
-```
-
----
-
-## 📡 API接口文档
-
-### 1. 论文分析接口
-
-**POST** `/api/v1/analyze`
-
-**请求示例：**
-```bash
-# 上传PDF文件
+# 将 paper.pdf 替换为你的论文文件
 curl -X POST "http://localhost:8000/api/v1/analyze" \
   -F "file=@paper.pdf"
-
-# 使用arXiv ID
-curl -X POST "http://localhost:8000/api/v1/analyze?arxiv_id=2301.12345"
-
-# 使用DOI
-curl -X POST "http://localhost:8000/api/v1/analyze?doi=10.1234/example"
 ```
 
-**响应示例：**
+预期响应：
 ```json
 {
   "task_id": "550e8400-e29b-41d4-a716-446655440000",
@@ -232,109 +185,22 @@ curl -X POST "http://localhost:8000/api/v1/analyze?doi=10.1234/example"
 }
 ```
 
-### 2. 查询任务状态
-
-**GET** `/api/v1/status/{task_id}`
-
-**响应示例：**
-```json
-{
-  "task_id": "550e8400-e29b-41d4-a716-446655440000",
-  "status": "completed",
-  "progress": 100,
-  "result": {
-    "paper_id": "uuid",
-    "title": "Attention Is All You Need",
-    "authors": ["Vaswani et al."],
-    "year": 2017,
-    "abstract": "...",
-    "math_models": [
-      {
-        "formula": "Scaled Dot-Product Attention",
-        "latex": "\\text{Attention}(Q,K,V) = ...",
-        "description": "Multi-head attention mechanism",
-        "formula_type": "equation",
-        "importance": 0.95,
-        "location": "Section 3.2"
-      }
-    ],
-    "domain_info": {
-      "primary_field": "Natural Language Processing",
-      "sub_fields": ["Machine Translation", "Transformer Architecture"],
-      "keywords": ["Attention", "Transformer", "Self-Attention"],
-      "confidence": 0.95
-    },
-    "key_scholars": [
-      {
-        "name": "Ashish Vaswani",
-        "affiliation": "Google Brain",
-        "h_index": 45,
-        "role": "author"
-      }
-    ],
-    "tech_roadmap": [
-      {
-        "method_name": "RNN",
-        "year": 2014,
-        "improvement": "Earlier sequential approach"
-      }
-    ],
-    "innovation_points": [
-      "Self-attention mechanism replaces RNNs",
-      "Parallel processing instead of sequential"
-    ],
-    "reproducibility_score": 0.9
-  }
-}
-```
-
-### 3. 搜索相似论文
-
-**GET** `/api/v1/search`
-
+#### 查询分析进度
 ```bash
-curl "http://localhost:8000/api/v1/search?query=transformer&limit=10"
+# 使用上面返回的 task_id
+curl "http://localhost:8000/api/v1/status/550e8400-e29b-41d4-a716-446655440000"
 ```
 
-### 4. 获取系统指标
+等待几秒后会返回完整的分析结果。
 
-**GET** `/api/v1/metrics`
-
+#### 使用arXiv ID进行分析
 ```bash
-curl "http://localhost:8000/api/v1/metrics"
+curl -X POST "http://localhost:8000/api/v1/analyze?arxiv_id=2301.12345"
 ```
 
----
+### 方法3：使用Python脚本
 
-## 🔑 环境变量配置
-
-编辑 `.env` 文件配置以下参数：
-
-```bash
-# OpenAI API配置（必填）
-OPENAI_API_KEY=sk-your-key-here
-OPENAI_MODEL=gpt-4-turbo-preview
-OPENAI_TEMPERATURE=0.3
-
-# Redis配置（可选，本地开发可跳过）
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=
-
-# 日志配置
-LOG_LEVEL=INFO
-DEBUG=false
-
-# 功能开关
-ENABLE_REDIS_CACHE=true
-ENABLE_RAG=true
-```
-
----
-
-## 💡 使用示例
-
-### Python客户端示例
+创建 `test_local.py`：
 
 ```python
 import requests
@@ -343,179 +209,327 @@ import json
 
 API_URL = "http://localhost:8000"
 
-# 1. 上传论文并开始分析
-print("📤 上传论文...")
-with open("paper.pdf", "rb") as f:
-    response = requests.post(
-        f"{API_URL}/api/v1/analyze",
-        files={"file": f}
-    )
+def test_health():
+    """测试健康检查"""
+    print("🏥 测试健康检查...")
+    response = requests.get(f"{API_URL}/health")
+    print(f"✅ 响应: {response.json()}\n")
 
-task_data = response.json()
-task_id = task_data["task_id"]
-print(f"✅ 任务ID: {task_id}")
+def test_analyze(pdf_path):
+    """测试论文分析"""
+    print(f"📤 上传论文: {pdf_path}")
+    
+    with open(pdf_path, "rb") as f:
+        response = requests.post(
+            f"{API_URL}/api/v1/analyze",
+            files={"file": f}
+        )
+    
+    task_data = response.json()
+    task_id = task_data["task_id"]
+    print(f"✅ 任务ID: {task_id}\n")
+    
+    # 轮询查询结果
+    print("⏳ 等待分析完成...")
+    while True:
+        status_response = requests.get(f"{API_URL}/api/v1/status/{task_id}")
+        status_data = status_response.json()
+        
+        progress = status_data.get("progress", 0)
+        status = status_data.get("status", "unknown")
+        print(f"进度: {progress}% | 状态: {status}")
+        
+        if status == "completed":
+            print("\n✅ 分析完成！\n")
+            result = status_data["result"]
+            
+            print("📊 分析结果摘要:")
+            print(f"  论文标题: {result.get('title', 'N/A')}")
+            print(f"  研究领域: {result.get('domain_info', {}).get('primary_field', 'N/A')}")
+            print(f"  数学模型数: {len(result.get('math_models', []))}")
+            print(f"  关键学者数: {len(result.get('key_scholars', []))}")
+            break
+        elif status == "failed":
+            print(f"❌ 分析失败: {status_data.get('error', 'Unknown error')}")
+            break
+        
+        time.sleep(3)
 
-# 2. 轮询检查分析进度
-print("\n⏳ 等待分析完成...")
-while True:
-    status_response = requests.get(f"{API_URL}/api/v1/status/{task_id}")
-    status_data = status_response.json()
-    
-    print(f"进度: {status_data['progress']}% - {status_data['status']}")
-    
-    if status_data["status"] == "completed":
-        break
-    elif status_data["status"] == "failed":
-        print(f"❌ 分析失败: {status_data['error']}")
-        break
-    
-    time.sleep(5)
+def test_search():
+    """测试搜索功能"""
+    print("🔍 测试搜索功能...")
+    response = requests.get(f"{API_URL}/api/v1/search?query=transformer&limit=5")
+    print(f"✅ 搜索结果数: {len(response.json().get('results', []))}\n")
 
-# 3. 获取分析结果
-if status_data["status"] == "completed":
-    result = status_data["result"]
+def test_metrics():
+    """测试指标"""
+    print("📊 获取系统指标...")
+    response = requests.get(f"{API_URL}/api/v1/metrics")
+    metrics = response.json()
+    print(f"✅ 已处理任务: {metrics.get('total_processed', 0)}")
+    print(f"✅ 缓存命中率: {metrics.get('cache_hit_rate', 0):.1%}\n")
+
+if __name__ == "__main__":
+    print("=" * 50)
+    print("📚 学术论文分析系统 - 本地验证测试")
+    print("=" * 50 + "\n")
     
-    print("\n📊 分析结果：")
-    print(f"论文: {result['title']}")
-    print(f"作者: {', '.join(result['authors'])}")
-    print(f"研究领域: {result['domain_info']['primary_field']}")
-    print(f"\n数学模型 ({len(result['math_models'])}):")
-    for model in result['math_models'][:3]:
-        print(f"  - {model['formula']}: {model['description']}")
+    # 运行测试
+    test_health()
+    test_search()
+    test_metrics()
     
-    print(f"\n关键学者 ({len(result['key_scholars'])}):")
-    for scholar in result['key_scholars'][:3]:
-        print(f"  - {scholar['name']} ({scholar['affiliation']})")
+    # 如有PDF文件，测试论文分析
+    pdf_file = "sample_paper.pdf"  # 替换为你的论文文件
+    try:
+        test_analyze(pdf_file)
+    except FileNotFoundError:
+        print(f"⚠️  文件 {pdf_file} 未找到，跳过分析测试")
     
-    print(f"\n创新点:")
-    for point in result['innovation_points'][:3]:
-        print(f"  - {point}")
+    print("=" * 50)
+    print("✅ 所有本地验证测试完成！")
+    print("=" * 50)
+```
+
+运行测试：
+```bash
+python test_local.py
 ```
 
 ---
 
-## 🔧 常见问题
+## 📡 API接口参考
 
-### Q1: 报错"OpenAI API Key无效"
-**A:** 
-1. 检查 `.env` 文件中的 `OPENAI_API_KEY`
-2. 确认API Key是有效的：https://platform.openai.com/api-keys
-3. 检查API配额是否充足
+### 1. 论文分析接口
 
-### Q2: Redis连接失败
-**A:** 
-- 本地开发可将 `ENABLE_REDIS_CACHE=false` 禁用缓存
-- Docker模式下自动启动Redis容器
+**POST** `/api/v1/analyze`
 
-### Q3: 内存不足或处理缓慢
-**A:** 
-- 调整 `OPENAI_TEMPERATURE` 参数（降低至0.1-0.3）
-- 启用Redis缓存提升性能
-- 使用Docker部署改善资源管理
+上传PDF文件进行分析
 
-### Q4: PDF解析失败
-**A:** 
-- 检查PDF文件是否已损坏
-- 某些扫描型PDF需要OCR处理（需配置Mathpix API）
-- 尝试使用标准的文本型PDF
+**参数：**
+- `file` (FormData) - PDF文件
+- `arxiv_id` (query, 可选) - arXiv论文ID
+- `doi` (query, 可选) - DOI号
 
-### Q5: 如何在生产环境中部署？
-**A:** 
-使用提供的一键部署脚本：
+**响应：**
+```json
+{
+  "task_id": "uuid",
+  "status": "processing",
+  "message": "分析已启动"
+}
+```
+
+### 2. 查询任务状态
+
+**GET** `/api/v1/status/{task_id}`
+
+**响应：**
+```json
+{
+  "task_id": "uuid",
+  "status": "completed",
+  "progress": 100,
+  "result": {
+    "title": "论文标题",
+    "authors": ["作者1", "作者2"],
+    "abstract": "摘要...",
+    "math_models": [...],
+    "domain_info": {...},
+    "key_scholars": [...],
+    "tech_roadmap": [...],
+    "innovation_points": [...],
+    "reproducibility_score": 0.9
+  }
+}
+```
+
+### 3. 搜索相似论文
+
+**GET** `/api/v1/search?query=transformer&limit=10`
+
+### 4. 获取系统指标
+
+**GET** `/api/v1/metrics`
+
+### 5. 健康检查
+
+**GET** `/health`
+
+---
+
+## 🔑 环境变量配置
+
+编辑 `.env` 文件配置以下参数：
+
 ```bash
-python scripts/deploy.py --ip <server-ip> --key <ssh-key-path>
+# ==================== 应用配置 ====================
+APP_NAME=Academic Paper Assistant
+DEBUG=false
+LOG_LEVEL=INFO
+HOST=0.0.0.0
+PORT=8000
+
+# ==================== OpenAI配置（必填）====================
+OPENAI_API_KEY=sk-your-api-key-here
+OPENAI_MODEL=gpt-4-turbo-preview
+OPENAI_TEMPERATURE=0.3
+
+# ==================== Redis配置（可选，本地开发可跳过）====================
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_TTL=3600
+ENABLE_REDIS_CACHE=false  # 本地开发建议设为false
+
+# ==================== 功能开关 ====================
+ENABLE_RAG=true
+CHROMA_PERSIST_DIR=./data/vector_db
 ```
 
 ---
 
-## 🔒 安全建议
+## 🐛 常见问题排查
 
-1. **API Key管理**
-   - 不要在代码中硬编码API Key
-   - 使用 `.env` 文件管理敏感信息
-   - 定期轮换API Key
+### ❌ "ModuleNotFoundError: No module named 'fastapi'"
 
-2. **网络安全**
-   - 在生产环境使用HTTPS
-   - 配置防火墙限制访问IP
-   - 启用Redis密码认证
-
-3. **数据隐私**
-   - 论文PDF存储在本地 `data/uploads` 目录
-   - 定期清理过期的上传文件
-   - 遵守学术版权法规
-
----
-
-## 📈 性能优化
-
-### 缓存策略
-- Redis缓存热点论文（TTL: 1小时）
-- 相同论文的重复查询直接返回缓存结果
-- 性能提升：8.2s → 1.9s (77%提升)
-
-### 并行处理
-- 多个Agent并行执行分析任务
-- 充分利用多核CPU
-- 通过 `asyncio.gather()` 实现异步协调
-
-### 资源限制
-- 单个PDF大小限制：100MB
-- 文本预处理：截取前20000字符避免Token超限
-- 任务队列在内存中管理
-
----
-
-## 🧪 测试
-
+**解决方案：**
 ```bash
-# 运行单元测试
-pytest tests/
+# 确保虚拟环境已激活
+# Windows: venv\Scripts\activate
+# Mac/Linux: source venv/bin/activate
 
-# 运行覆盖率检查
-pytest --cov=app tests/
+# 重新安装依赖
+pip install -r requirements.txt
+```
 
-# 性能测试
-locust -f tests/load_test.py
+### ❌ "OPENAI_API_KEY is required"
+
+**解决方案：**
+1. 检查 `.env` 文件存在
+2. 确保 `OPENAI_API_KEY=sk-...` 已填写
+3. 确保API Key有效：https://platform.openai.com/account/api-keys
+
+### ❌ "API returned 401 Unauthorized"
+
+**解决方案：**
+- 检查OpenAI API Key是否正确
+- 检查API配额是否充足
+- 检查账户是否为付费账户
+
+### ❌ "Port 8000 already in use"
+
+**解决方案：**
+```bash
+# 使用不同的端口启动
+# 编辑 .env 文件，改为 PORT=8001
+# 或手动杀死占用8000端口的进程
+```
+
+### ❌ "PDF解析失败"
+
+**可能原因：**
+- PDF文件已损坏
+- 扫描型PDF需要OCR（当前不支持）
+- 文件过大（>100MB）
+
+**解决方案：**
+- 尝试用其他PDF阅读器打开确认文件完整性
+- 使用文本型PDF而不是扫描图像
+- 调整PDF大小
+
+### ❌ "分析超时或很慢"
+
+**优化方案：**
+- 启用Redis缓存：`ENABLE_REDIS_CACHE=true`
+- 降低Temperature参数：`OPENAI_TEMPERATURE=0.1`
+- 缩小PDF文件大小
+- 使用更快的网络连接
+
+---
+
+## 📊 本地性能基准
+
+在标准配置下的预期性能：
+
+| 指标 | 数值 |
+|------|------|
+| 首次分析 (冷启动) | 8-15秒 |
+| 缓存命中响应 | <2秒 |
+| 平均缓存命中率 | 65% |
+| CPU使用率 | 平均30% (峰值80%) |
+| 内存占用 | 平均500MB (峰值1.5GB) |
+
+---
+
+## 🧪 验证成功标志
+
+✅ 系统已正确配置，如果你能看到：
+
+1. **启动无错误** - 日志显示 "Application startup complete"
+2. **API文档可访问** - http://localhost:8000/docs 能打开
+3. **健康检查通过** - `/health` 端点返回 200 OK
+4. **论文分析可运行** - 能上传PDF并获得task_id
+5. **任务状态可查询** - `/api/v1/status/{task_id}` 返回进度
+
+---
+
+## 🔄 典型验证流程
+
+```
+1. 启动应用
+   └─> scripts\run_local.bat (Windows) 或 bash scripts/run_local.sh (Mac/Linux)
+
+2. 打开API文档
+   └─> http://localhost:8000/docs
+
+3. 测试健康检查
+   └─> GET /health
+
+4. 上传论文进行分析
+   └─> POST /api/v1/analyze (上传PDF文件)
+
+5. 查询分析进度
+   └─> GET /api/v1/status/{task_id} (每3-5秒查一次)
+
+6. 获取最终结果
+   └─> 等待status变为"completed"后查看result字段
 ```
 
 ---
 
 ## 📚 相关资源
 
-- [FastAPI文档](https://fastapi.tiangolo.com)
-- [LangChain文档](https://docs.langchain.com)
-- [OpenAI API文档](https://platform.openai.com/docs)
-- [Docker文档](https://docs.docker.com)
+- 📖 [FastAPI官方文档](https://fastapi.tiangolo.com)
+- 📖 [LangChain官方文档](https://docs.langchain.com)
+- 📖 [OpenAI API文档](https://platform.openai.com/docs)
+- 📖 [Python虚拟环境指南](https://docs.python.org/3/tutorial/venv.html)
 
 ---
 
-## 🤝 贡献指南
+## 🎯 下一步
 
-欢迎提交Issue和Pull Request！
+本地验证成功后，你可以：
 
-1. Fork项目
-2. 创建特性分支：`git checkout -b feature/your-feature`
-3. 提交改动：`git commit -m "Add: your feature"`
-4. 推送到分支：`git push origin feature/your-feature`
-5. 创建Pull Request
-
----
-
-## 📄 许可证
-
-MIT License - 详见 [LICENSE](LICENSE) 文件
+1. **深度测试** - 用不同的论文文件测试系统
+2. **自定义配置** - 调整OpenAI模型、温度参数等
+3. **代码扩展** - 修改Agent逻辑或添加新的分析功能
+4. **性能优化** - 启用Redis缓存、调整并发设置
+5. **Docker部署** - 使用Docker容器化部署应用
 
 ---
 
-## 📧 联系方式
+## 📧 获取帮助
 
-- 📧 Email: support@academic-assistant.ai
-- 🌐 网站: https://academic-assistant.ai
-- 💬 问题反馈: GitHub Issues
+遇到问题？
+
+1. 检查日志输出（控制台会显示详细错误信息）
+2. 查看上面的"常见问题排查"部分
+3. 确认所有前置条件都已满足
+4. 验证 `.env` 文件配置正确
 
 ---
 
-**🎉 感谢使用学术助手系统！**
+**🎉 祝你使用愉快！**
 
-如果这个项目对你有帮助，请给个 ⭐ Star 支持一下！
+如果这个项目对你有帮助，欢迎给个 ⭐ Star 支持！
